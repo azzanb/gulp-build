@@ -48,7 +48,7 @@ gulp.task('scripts', () => {
 });
 
 gulp.task('clean', () => {
-	return del.sync(['dist', 'css']);
+	return del.sync('dist');
 });
 
 gulp.task('connect', () => {
