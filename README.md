@@ -2,4 +2,5 @@
 ##Run ```npm install``` and all dev dependencies will be included
 
 
-##Run ```gulp``` and go to ```http://localhost:3000/``` 
+##Run ```gulp``` and the browser will automatically take you to ```http://localhost:3000/``` 
+ 
