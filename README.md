@@ -1,4 +1,4 @@
-# gulp-build
+# Serve Static Templates with Gulp
 ##Run ```npm install``` and all dev dependencies will be included
 
 
