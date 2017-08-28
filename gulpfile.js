@@ -11,14 +11,26 @@ const gulp = require('gulp'),
 	  cache = require('gulp-cache'),
 	  imagemin = require('gulp-imagemin'),
 	  runSequence = require('run-sequence'),
+	  browserSync = require('browser-sync'),
 	  connect = require('gulp-connect'),
 	  del = require('del');
 
-// gulp.task('tocss', () => {
-// 	return gulp.src('sass/**/*.scss')
-// 			.pipe(sass())
-// 			.pipe(gulp.dest('./css/'));
-// });
+
+gulp.task('htmlStyles', () =>{
+	return gulp.src('sass/**/*.scss')  		    //TASK 1
+			.pipe(sass())
+			.pipe(gulp.dest('css'));
+});
+
+gulp.task('styles', ['htmlStyles'], () => {
+	return gulp.src('index.html')
+		.pipe(map.init())
+		.pipe(useref())                 		//TASK 2
+		.pipe(iff('*.css', csso()))
+		.pipe(rename('all.min.css'))
+		.pipe(map.write('./'))
+		.pipe(gulp.dest('dist/styles'));
+});
 
 gulp.task('htmlScripts', ['styles'], () => {
 	return gulp.src('index.html')
@@ -35,22 +47,6 @@ gulp.task('scripts', ['htmlScripts'], () => {
 			.pipe(gulp.dest('dist/scripts'));
 });
 
-gulp.task('styles', ['htmlStyles'], () => {
-	return gulp.src('index.html')
-		.pipe(map.init())
-		.pipe(useref())                 		//TASK 2
-		.pipe(iff('*.css', csso()))
-		.pipe(rename('all.min.css'))
-		.pipe(map.write('./'))
-		.pipe(gulp.dest('dist/styles'));
-});
-
-gulp.task('htmlStyles', () =>{
-	return gulp.src('sass/**/*.scss')  		    //TASK 1
-			.pipe(sass())
-			.pipe(gulp.dest('css'));
-});
-
 gulp.task('images', () => {
 	return gulp.src('images/*.+(png|jpg)')
 			.pipe(cache(imagemin()))			//TASK WHENEVER 
@@ -58,21 +54,33 @@ gulp.task('images', () => {
 });
 
 gulp.task('clean', () => {
-	return del.sync(['dist', 'css']);
+	return del.sync(['dist', 'css']);			//Clean up
 });
 
 
 gulp.task('build', (callback) => {
-	runSequence('clean', ['scripts', 'images', 'styles'], callback);
+	runSequence('clean', ['scripts', 'images', 'styles'], callback);	//Create build
 	gulp.src('icons/**/*').pipe(gulp.dest('dist/icons'));
 });
 
-gulp.task('connect', () => {
+gulp.task('connect', () => {					//Connect to server
 	return connect.server({ port: 3000 });
 });
 
-gulp.task('default', (callback) => {
-	runSequence('build', 'connect', callback);
+gulp.task('watch', () => {						//Watch .scss file changes
+	gulp.watch('sass/**/*.scss', ['styles'])
+});
+
+gulp.task('sync', ['watch'], () => {			//If changes, show them on the web
+	browserSync.init({
+		server: {
+			baseDir: './'
+		},
+  	}); 
+});
+
+gulp.task('default', (callback) => {						//Run 'gulp'
+	runSequence('build', 'connect', 'sync', callback);
 });
 
 
