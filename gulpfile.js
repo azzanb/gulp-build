@@ -25,7 +25,7 @@ gulp.task('htmlStyles', () =>{
 gulp.task('styles', ['htmlStyles'], () => {
 	return gulp.src('index.html')
 		.pipe(map.init())
-		.pipe(useref())                 		//TASK 2
+		.pipe(useref())                 		//TASK 2 (Run gulp styles)
 		.pipe(iff('*.css', csso()))
 		.pipe(rename('all.min.css'))
 		.pipe(map.write('./'))
@@ -41,7 +41,7 @@ gulp.task('htmlScripts', ['styles'], () => {
 
 gulp.task('scripts', ['htmlScripts'], () => {
 	return gulp.src('dist/scripts/*.js')
-			.pipe(map.init())					//TASK 4
+			.pipe(map.init())					//TASK 4 (Run gulp scripts)
 			.pipe(rename('all.min.js')) 
 			.pipe(map.write('./'))
 			.pipe(gulp.dest('dist/scripts'));
@@ -49,7 +49,7 @@ gulp.task('scripts', ['htmlScripts'], () => {
 
 gulp.task('images', () => {
 	return gulp.src('images/*.+(png|jpg)')
-			.pipe(cache(imagemin()))			//TASK WHENEVER 
+			.pipe(cache(imagemin()))			//Can be run WHENEVER 
 			.pipe(gulp.dest('dist/content'))
 });
 
@@ -86,7 +86,7 @@ gulp.task('default', (callback) => {						//Run 'gulp'
 
 /*
 NOTES
---don't use uglify on sass files when compiling them to css
+--avoid using uglify on sass files when compiling them to css
 --create css source maps AFTER compiling sass to css
 */
 
