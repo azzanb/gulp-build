@@ -17,7 +17,7 @@ const gulp = require('gulp'),
 
 
 gulp.task('htmlStyles', () =>{
-	return gulp.src('sass/**/*.scss')  		    //TASK 1
+	return gulp.src('sass/**/*.scss')  		    //a dependency of 'styles'
 			.pipe(sass())
 			.pipe(gulp.dest('css'));
 });
@@ -35,7 +35,7 @@ gulp.task('styles', ['htmlStyles'], () => {
 gulp.task('htmlScripts', ['styles'], () => {
 	return gulp.src('index.html')
 		.pipe(useref())
-		.pipe((iff('*.js', uglify()))) 			//TASK 3
+		.pipe((iff('*.js', uglify()))) 			//a dependency of 'scripts'
 		.pipe(gulp.dest('dist'));
 });
 
