@@ -15,33 +15,41 @@ const gulp = require('gulp'),
 	  connect = require('gulp-connect'),
 	  del = require('del');
 
+/*
+
+1) htmlStyles compiles all sass/scss files to css
+2) htmlScripts concatenates and minifies css and js files
+3) styles creates a css map
+4) scripts creates a js map
+
+*/
+
 
 gulp.task('htmlStyles', () =>{
-	return gulp.src('sass/**/*.scss')  		    //a dependency of 'styles'
-			.pipe(sass())
+	return gulp.src('sass/*.{scss,sass}')  		    //a dependency of 'htmlScripts'
+			.pipe(sass().on('error', sass.logError))
 			.pipe(gulp.dest('css'));
 });
 
-gulp.task('styles', ['htmlStyles'], () => {
+gulp.task('htmlScripts', ['htmlStyles'], () => {
+	return gulp.src('index.html')
+		.pipe(useref())
+		.pipe((iff('*.css', csso()))) 	
+		.pipe((iff('*.js', uglify()))) 			//a dependency of 'scripts' and 'styles'
+		.pipe(gulp.dest('dist'));
+});
+
+gulp.task('styles', ['htmlScripts'], () => {
 	return gulp.src('index.html')
 		.pipe(map.init())
-		.pipe(useref())                 		//TASK 2 (Run gulp styles)
-		.pipe(iff('*.css', csso()))
 		.pipe(rename('all.min.css'))
 		.pipe(map.write('./'))
 		.pipe(gulp.dest('dist/styles'));
 });
 
-gulp.task('htmlScripts', ['styles'], () => {
-	return gulp.src('index.html')
-		.pipe(useref())
-		.pipe((iff('*.js', uglify()))) 			//a dependency of 'scripts'
-		.pipe(gulp.dest('dist'));
-});
-
 gulp.task('scripts', ['htmlScripts'], () => {
-	return gulp.src('dist/scripts/*.js')
-			.pipe(map.init())					//TASK 4 (Run gulp scripts)
+	return gulp.src('js/**/*.js')
+			.pipe(map.init())					
 			.pipe(rename('all.min.js')) 
 			.pipe(map.write('./'))
 			.pipe(gulp.dest('dist/scripts'));
@@ -59,7 +67,7 @@ gulp.task('clean', () => {
 
 
 gulp.task('build', (callback) => {
-	runSequence('clean', ['scripts', 'images', 'styles'], callback);	//Create build
+	runSequence('clean', ['scripts', 'styles', 'images'], callback);	//Create build
 	gulp.src('icons/**/*').pipe(gulp.dest('dist/icons'));
 });
 
